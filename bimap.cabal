@@ -1,0 +1,37 @@
+cabal-version:       >= 1.2.3.0
+name:                bimap
+version:             0.2.4
+synopsis:            Bidirectional mapping between two key types
+description:
+  A data structure representing a bidirectional mapping between two
+  key types. Each value in the bimap is associated with exactly one
+  value of the opposite type.
+category:            Data
+license:             BSD3
+license-file:        LICENSE
+copyright:           Stuart Cook and contributors 2008
+author:              Stuart Cook and contributors 2008
+maintainer:          scook0@gmail.com
+homepage:            http://code.haskell.org/bimap
+-- This build-type is a lie, but we're only using hooks to specify
+-- a test command, so there shouldn't be any problems.
+build-type:          Simple
+tested-with:         GHC ==6.6, GHC ==6.8.1
+extra-source-files:
+    HISTORY
+    tests.sh
+    Test/Tests.hs
+    Test/Util.hs
+    Test/RunTests.hs
+
+flag small-base
+
+Library
+  if flag(small-base)
+    build-depends:       base >= 3, containers
+  else
+    build-depends:       base < 3
+  ghc-options:         -Wall
+  exposed-modules:
+      Data.Bimap
+

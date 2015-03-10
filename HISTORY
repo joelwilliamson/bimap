@@ -1,0 +1,36 @@
+Version 0.2.4 (25 Aug 2008)
+
+  * added filter and partition
+
+Version 0.2.3 (1 Jul 2008)
+
+  * added fromAscPairList and fromAscPairListUnchecked
+      (thanks to Janis Voigtländer)
+  * more tests for min/max functions (thanks to Jochem Berndsen)
+
+Version 0.2.2 (18 Jun 2008)
+
+  * added min/max functions (thanks to Jochem Berndsen)
+  * added tryInsert
+  * added fromAList
+  * more tests for existing functionality
+
+Version 0.2.1 (6 Feb 2008)
+
+  * removed MTL dependency
+  * removed Control.Arrow dependency
+  * now Haskell 98, modulo "foldl'" and hierarchical modules
+  * added toMap and toMapR
+  * added big-O comments
+  * added "version" info in function comments
+
+Version 0.2 (5 Feb 2008)
+
+  * large, incompatible interface overhaul
+  * GHC 6.8 support
+  * Eq instance
+
+Version 0.1 (4 Feb 2008)
+
+  * initial release
+  * Data.Bimap and test suite
