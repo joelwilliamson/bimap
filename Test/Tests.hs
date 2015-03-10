@@ -15,6 +15,9 @@ import Data.Bimap
 instance (Ord a, Arbitrary a, Ord b, Arbitrary b)
     => Arbitrary (Bimap a b) where
     arbitrary = fromList `fmap` arbitrary
+
+instance (Ord a, CoArbitrary a, Ord b, CoArbitrary b)
+    => CoArbitrary (Bimap a b) where
     coarbitrary = coarbitrary . toList
 
 -- generator for filter/partition classification functions
@@ -28,6 +31,8 @@ instance (Integral a, Arbitrary a, Integral b, Arbitrary b)
         return $ FilterFunc
             ("(\\x y -> x - y < " ++ show pivot ++ ")")
             (\x y -> fromIntegral x - fromIntegral y < pivot)
+instance (Integral a, CoArbitrary a, Integral b, CoArbitrary b)
+    => CoArbitrary (FilterFunc a b) where
     coarbitrary _ gen = do
         x <- arbitrary
         coarbitrary (x :: Int) gen
@@ -66,8 +71,7 @@ prop_fromList_size xs = (size $ fromList xs) <= length xs
 
 -- a monotone bimap can be reconstituted via fromAscPairList
 prop_fromAscPairList_reconstitute xs = and
-    [ (not . isBottom) bi'
-    , valid bi'
+    [ valid bi'
     , (bi == bi')
     ]
     where
@@ -77,10 +81,7 @@ prop_fromAscPairList_reconstitute xs = and
     bi' = fromAscPairList . toAscList $ bi
 
 -- fromAscPairList will never produce an invalid bimap
-prop_fromAscPairList_check xs = or
-    [ isBottom bi
-    , valid bi
-    ]
+prop_fromAscPairList_check xs = valid bi
     where
     bi :: Bimap Int Integer
     bi = fromAscPairList xs
