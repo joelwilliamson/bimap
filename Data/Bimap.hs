@@ -178,7 +178,7 @@ already in the bimap.
 tryInsert :: (Ord a, Ord b)
           => a -> b -> Bimap a b -> Bimap a b
 tryInsert x y bi
-    | (x `notMember` bi && y `notMemberR` bi) = unsafeInsert x y bi
+    | x `notMember` bi && y `notMemberR` bi = unsafeInsert x y bi
     | otherwise                               = bi
 
 {-| /O(log n)/.
@@ -198,12 +198,12 @@ deleteE :: (Ord a, Ord b)
        => Either a b -> Bimap a b -> Bimap a b
 deleteE e (MkBimap left right) =
     MkBimap
-        (perhaps M.delete x $ left)
-        (perhaps M.delete y $ right)
+        (perhaps M.delete x  left)
+        (perhaps M.delete y  right)
     where
     perhaps = maybe id
-    x = either Just (flip M.lookup right) e
-    y = either (flip M.lookup left) Just  e
+    x = either Just (`M.lookup` right) e
+    y = either (`M.lookup` left) Just  e
 
 {-| /O(log n)/.
 Delete a value and its twin from a bimap.
@@ -231,7 +231,7 @@ lookup :: (Ord a, Ord b, Monad m)
         => a -> Bimap a b -> m b
 lookup x (MkBimap left _) =
     maybe (fail "Data.Bimap.lookup: Left key not found")
-          (return)
+          return
           (M.lookup x left)
 
 {-| /O(log n)/.
@@ -242,7 +242,7 @@ lookupR :: (Ord a, Ord b, Monad m)
         => b -> Bimap a b -> m a
 lookupR y (MkBimap _ right) =
     maybe (fail "Data.Bimap.lookupR: Right key not found")
-          (return)
+          return
           (M.lookup y right)
 
 {-| /O(log n)/.
@@ -250,18 +250,14 @@ Find the right key corresponding to a given left key.
 Calls @'error'@ when the key is not in the bimap.
 /Version: 0.2/-}
 (!) :: (Ord a, Ord b) => Bimap a b -> a -> b
-(!) bi x = case lookup x bi of
-    Just y  -> y
-    Nothing -> error "Data.Bimap.(!): Left key not found"
+(!) bi x = fromMaybe (error "Data.Bimap.(!): Left key not found") $ lookup x bi
 
 {-| /O(log n)/.
 A version of @(!)@ that is specialized to the right key,
 and returns the corresponding left key.
 /Version: 0.2/-}
 (!>) :: (Ord a, Ord b) => Bimap a b -> b -> a
-(!>) bi y = case lookupR y bi of
-    Just x  -> x
-    Nothing -> error "Data.Bimap.(!>): Right key not found"
+(!>) bi y = fromMaybe (error "Data.Bimap.(!>): Right key not found") $ lookupR y bi
 
 {-| /O(n*log n)/.
 Build a map from a list of pairs. If there are any overlapping
@@ -269,7 +265,7 @@ pairs in the list, the later ones will override the earlier ones.
 /Version: 0.2/-}
 fromList :: (Ord a, Ord b)
          => [(a, b)] -> Bimap a b
-fromList xs = foldl' (flip . uncurry $ insert) empty xs
+fromList = foldl' (flip . uncurry $ insert) empty
 
 {-| /O(n*log n)/.
 Build a map from a list of pairs. Unlike 'fromList', earlier pairs
@@ -285,7 +281,7 @@ contains no duplicates, then the equality holds.
 /Version: 0.2.2/-}
 fromAList :: (Ord a, Ord b)
           => [(a, b)] -> Bimap a b
-fromAList xs = foldl' (flip . uncurry $ tryInsert) empty xs
+fromAList = foldl' (flip . uncurry $ tryInsert) empty
 
 {-| /O(n)/. Convert to a list of associated pairs.
 /Version: 0.2/-}
@@ -461,14 +457,14 @@ Map a function over all the left keys in the map.
 /Version 0.3/-}
 map :: Ord c => (a -> c) -> Bimap a b -> Bimap c b
 map f (MkBimap left right) =
-    (MkBimap (M.mapKeys f left) (M.map f right))
+    MkBimap (M.mapKeys f left) (M.map f right)
 
 {-| /O(n*log n)/
 Map a function over all the right keys in the map.
 /Version 0.3/-}
 mapR :: Ord c => (b -> c) -> Bimap a b -> Bimap a c
 mapR f (MkBimap left right) =
-    (MkBimap (M.map f left) (M.mapKeys f right))
+    MkBimap (M.map f left) (M.mapKeys f right)
 
 {-| /O(n)/.
 Map a strictly increasing function over all left keys in the map.
@@ -476,7 +472,7 @@ Map a strictly increasing function over all left keys in the map.
 /Version 0.3/-}
 mapMonotonic :: (a -> c) -> Bimap a b -> Bimap c b
 mapMonotonic f (MkBimap left right) =
-    (MkBimap (M.mapKeysMonotonic f left) (M.map f right))
+    MkBimap (M.mapKeysMonotonic f left) (M.map f right)
 
 {-| /O(n)/.
 Map a strictly increasing function over all right keys in the map.
@@ -484,7 +480,7 @@ Map a strictly increasing function over all right keys in the map.
 /Version 0.3/-}
 mapMonotonicR :: (b -> c) -> Bimap a b -> Bimap a c
 mapMonotonicR f (MkBimap left right) =
-    (MkBimap (M.map f left) (M.mapKeysMonotonic f right))
+    MkBimap (M.map f left) (M.mapKeysMonotonic f right)
 
 {-| /O(log n)/.
 Delete and find the element with maximal left key.
