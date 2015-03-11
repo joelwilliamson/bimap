@@ -67,6 +67,10 @@ module Data.Bimap (
     elems,
     assocs,
     fold,
+    Data.Bimap.map,
+    mapR,
+    mapMonotonic,
+    mapMonotonicR,
     toMap,
     toMapR,
     -- * Miscellaneous
@@ -324,7 +328,7 @@ fromAscPairListUnchecked :: (Ord a, Ord b)
                          => [(a, b)] -> Bimap a b
 fromAscPairListUnchecked xs = MkBimap
     (M.fromAscList xs)
-    (M.fromAscList $ map swap  xs)
+    (M.fromAscList $ P.map swap  xs)
     where
     swap (x, y) = (y, x)
 
@@ -427,7 +431,7 @@ valid (MkBimap left right) = and
     [ M.valid left, M.valid right
     , (==)
         (sort .                M.toList $ left )
-        (sort . map flipPair . M.toList $ right)
+        (sort . P.map flipPair . M.toList $ right)
     ]
     where
     flipPair (x, y) = (y, x)
@@ -451,6 +455,36 @@ Fold the association pairs in the map, such that
 /Version: 0.2/-}
 fold :: (a -> b -> c -> c) -> c -> Bimap a b -> c
 fold f z = foldr (uncurry f) z . assocs
+
+{-| /O(n*log n)/
+Map a function over all the left keys in the map.
+/Version 0.3/-}
+map :: Ord c => (a -> c) -> Bimap a b -> Bimap c b
+map f (MkBimap left right) =
+    (MkBimap (M.mapKeys f left) (M.map f right))
+
+{-| /O(n*log n)/
+Map a function over all the right keys in the map.
+/Version 0.3/-}
+mapR :: Ord c => (b -> c) -> Bimap a b -> Bimap a c
+mapR f (MkBimap left right) =
+    (MkBimap (M.map f left) (M.mapKeys f right))
+
+{-| /O(n)/.
+Map a strictly increasing function over all left keys in the map.
+/The precondition is not checked./
+/Version 0.3/-}
+mapMonotonic :: (a -> c) -> Bimap a b -> Bimap c b
+mapMonotonic f (MkBimap left right) =
+    (MkBimap (M.mapKeysMonotonic f left) (M.map f right))
+
+{-| /O(n)/.
+Map a strictly increasing function over all right keys in the map.
+/The precondition is not checked./
+/Version 0.3/-}
+mapMonotonicR :: (b -> c) -> Bimap a b -> Bimap a c
+mapMonotonicR f (MkBimap left right) =
+    (MkBimap (M.map f left) (M.mapKeysMonotonic f right))
 
 {-| /O(log n)/.
 Delete and find the element with maximal left key.

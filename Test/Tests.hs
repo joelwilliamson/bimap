@@ -2,10 +2,10 @@ module Test.Tests where
 
 import Data.List (sort)
 import qualified Data.Set as S
-import Prelude hiding (null, lookup, filter)
+import Prelude hiding (null, lookup, filter,map)
 import qualified Prelude as P
 import Test.QuickCheck
---import Test.QuickCheck.Batch
+import Control.Applicative((<$>))
 
 import Data.Bimap
 
@@ -61,8 +61,8 @@ prop_fromList_account xs = all (\x -> isMember x || notUnique x) xs
     bi = fromList xs
     isMember x = x `pairMember` bi
     notUnique (x, y) = 
-        ((>1) . length . P.filter (== x) . map fst $ xs) ||
-        ((>1) . length . P.filter (== y) . map snd $ xs)
+        ((>1) . length . P.filter (== x) . P.map fst $ xs) ||
+        ((>1) . length . P.filter (== y) . P.map snd $ xs)
 
 -- a bimap created from a list is no larger than the list
 prop_fromList_size xs = (size $ fromList xs) <= length xs
@@ -75,7 +75,7 @@ prop_fromAscPairList_reconstitute xs = and
     , (bi == bi')
     ]
     where
-    xs' = zip (sort $ map fst xs) (sort $ map snd xs)
+    xs' = zip (sort $ P.map fst xs) (sort $ P.map snd xs)
     bi :: Bimap Int Integer
     bi = fromList xs'
     bi' = fromAscPairList . toAscList $ bi
@@ -443,3 +443,50 @@ prop_deleteFindMaxR_is_valid bi = not (null bi) ==>
     where
     _ = bi :: Bimap Int Integer
 
+prop_map_preserve_keys bi =
+    (Data.List.sort $ P.map f $ keys bi) == (keys $ map f bi)
+    where
+    f = (4/) -- This is an arbitrary function
+    _ = bi :: Bimap Double Integer
+
+prop_map_preserve_lookup bi v =
+    (lookup (f v) $ map f bi) == (lookup v bi :: Maybe Integer)
+    where
+    f = (1-)
+    _ = bi :: Bimap Int Integer
+
+prop_map_preserve_right_keys bi =
+    (Data.List.sort $ P.map f $ keysR bi) == (keysR $ mapR f bi)
+    where
+    f = (4/) -- This is an arbitrary function
+    _ = bi :: Bimap Int Double
+
+prop_map_preserve_lookupR bi v =
+    (lookup v $ mapR f bi) == (f <$> lookup v bi :: Maybe Integer)
+    where
+    f = (1-)
+    _ = bi :: Bimap Int Integer
+
+prop_mapMonotonic_preserve_keys bi =
+    (P.map f $ keys bi) == (keys $ mapMonotonic f bi)
+    where
+    f = (3+) -- This is an arbitrary monotonic function
+    _ = bi :: Bimap Double Integer
+
+prop_mapMonotonic_preserve_lookup bi v =
+    (lookup (f v) $ mapMonotonic f bi) == (lookup v bi :: Maybe Integer)
+    where
+    f = (2*)
+    _ = bi :: Bimap Int Integer
+
+prop_mapMontonic_preserve_right_keys bi =
+    (P.map f $ keysR bi) == (keysR $ mapMonotonicR f bi)
+    where
+    f = (^2) -- This is an arbitrary monotonic function
+    _ = bi :: Bimap Int Double
+
+prop_mapMonotonic_preserve_lookupR bi v =
+    (lookup v $ mapMonotonicR f bi) == (f <$> lookup v bi :: Maybe Integer)
+    where
+    f = (1-)
+    _ = bi :: Bimap Int Integer
