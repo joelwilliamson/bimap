@@ -1,6 +1,6 @@
-cabal-version:       >= 1.2.3.0
+cabal-version:       >= 1.6
 name:                bimap
-version:             0.2.4
+version:             0.3.0
 synopsis:            Bidirectional mapping between two key types
 description:
   A data structure representing a bidirectional mapping between two
@@ -11,12 +11,12 @@ license:             BSD3
 license-file:        LICENSE
 copyright:           Stuart Cook and contributors 2008
 author:              Stuart Cook and contributors 2008
-maintainer:          scook0@gmail.com
-homepage:            http://code.haskell.org/bimap
+maintainer:          joel@joelwilliamson.ca
+homepage:            https://github.com/joelwilliamson/bimap
 -- This build-type is a lie, but we're only using hooks to specify
 -- a test command, so there shouldn't be any problems.
 build-type:          Simple
-tested-with:         GHC ==6.6, GHC ==6.8.1
+tested-with:         GHC ==7.8.4
 extra-source-files:
     HISTORY
     tests.sh
@@ -24,14 +24,12 @@ extra-source-files:
     Test/Util.hs
     Test/RunTests.hs
 
-flag small-base
-
 Library
-  if flag(small-base)
-    build-depends:       base >= 3, containers
-  else
-    build-depends:       base < 3
+  build-depends:       base >= 4 && <5, containers
   ghc-options:         -Wall
   exposed-modules:
       Data.Bimap
 
+source-repository head
+    type:         git
+    location:     https://github.com/joelwilliamson/bimap.git
