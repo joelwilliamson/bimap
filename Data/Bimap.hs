@@ -83,6 +83,7 @@ import Data.List (foldl', sort)
 import qualified Data.Map as M
 import Prelude hiding (lookup, null, filter, pred)
 import qualified Prelude as P
+import Data.Maybe(fromMaybe)
 
 
 infixr 9 .:
