@@ -9,9 +9,9 @@ description:
 category:            Data
 license:             BSD3
 license-file:        LICENSE
-copyright:           Stuart Cook and contributors 2008
-author:              Stuart Cook and contributors 2008
-maintainer:          joel@joelwilliamson.ca
+copyright:           Stuart Cook and contributors 2008, Joel Williamson 2015
+author:              Stuart Cook and contributors 2008, Joel Williamson 2015
+maintainer:          Joel Williamson <joel@joelwilliamson.ca>
 homepage:            https://github.com/joelwilliamson/bimap
 -- This build-type is a lie, but we're only using hooks to specify
 -- a test command, so there shouldn't be any problems.
