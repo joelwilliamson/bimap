@@ -79,11 +79,15 @@ module Data.Bimap (
     twisted,
 ) where
 
-import Data.List (foldl', sort)
-import qualified Data.Map as M
-import Prelude hiding (lookup, null, filter, pred)
-import qualified Prelude as P
-import Data.Maybe(fromMaybe)
+import           Control.Monad.Catch
+
+import           Data.List           (foldl', sort)
+import qualified Data.Map            as M
+import           Data.Maybe          (fromMaybe)
+import           Data.Typeable
+
+import           Prelude             hiding (filter, lookup, null, pred)
+import qualified Prelude             as P
 
 
 infixr 9 .:
@@ -100,6 +104,14 @@ instance (Show a, Show b) => Show (Bimap a b) where
 
 instance (Eq a, Eq b) => Eq (Bimap a b) where
     (==) bx by = toAscList bx == toAscList by
+
+{-|
+A 'Bimap' action failed.
+-}
+data BimapException = KeyNotFound String
+  deriving(Eq, Show, Typeable)
+
+instance Exception BimapException
 
 {-| /O(1)/. The empty bimap.
 /Version: 0.2/-}
@@ -228,10 +240,10 @@ This function will @return@ the result in the monad, or @fail@ if
 the value isn't in the bimap.
 
 /Version: 0.2/-}
-lookup :: (Ord a, Ord b, Monad m)
-        => a -> Bimap a b -> m b
+lookup :: (Ord a, Ord b, MonadThrow m)
+       => a -> Bimap a b -> m b
 lookup x (MkBimap left _) =
-    maybe (fail "Data.Bimap.lookup: Left key not found")
+    maybe (throwM $ KeyNotFound "Data.Bimap.lookup")
           return
           (M.lookup x left)
 
@@ -239,10 +251,10 @@ lookup x (MkBimap left _) =
 A version of 'lookup' that is specialized to the right key,
 and returns the corresponding left key.
 /Version: 0.2/-}
-lookupR :: (Ord a, Ord b, Monad m)
+lookupR :: (Ord a, Ord b, MonadThrow m)
         => b -> Bimap a b -> m a
 lookupR y (MkBimap _ right) =
-    maybe (fail "Data.Bimap.lookupR: Right key not found")
+    maybe (throwM $ KeyNotFound "Data.Bimap.lookupR")
           return
           (M.lookup y right)
 
