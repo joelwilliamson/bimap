@@ -162,6 +162,21 @@ prop_delete_twin bi = flip all (toList bi) $ \(x, y) -> and
     where
     _ = bi :: Bimap Int Integer
 
+-- adjust and fmap are similar
+prop_adjust_fmap bi a = l === r
+  where
+  l = lookup a $ adjust f a bi :: Maybe Integer
+  r = f <$> lookup a bi
+  _ = bi :: Bimap Int Integer
+  f = (1-)
+
+prop_adjustR_fmap bi b = l == r
+  where
+  l = lookupR b $ adjustR f b bi :: Maybe Int
+  r = f <$> lookupR b bi
+  _ = bi :: Bimap Int Integer
+  f = (3*)
+
 -- a singleton bimap is valid, has one association, and the two
 -- given values map to each other
 prop_singleton x y = let bi = singleton x y in and
