@@ -36,6 +36,14 @@ module Data.Bimap (
     -- * Update
     insert,
     tryInsert,
+    adjust,
+    adjustR,
+    adjustWithKey,
+    adjustWithKeyR,
+    update,
+    updateR,
+    updateWithKey,
+    updateWithKeyR,
     delete,
     deleteR,
     -- * Min\/Max
@@ -232,6 +240,80 @@ delete = deleteE . Left
 /Version: 0.2/-}
 deleteR :: (Ord a, Ord b) => b -> Bimap a b -> Bimap a b
 deleteR = deleteE . Right
+
+{-| /O(log n)/.
+Update a value at a specific left key with the result of the provided function.
+
+When the left key is not a member of the bimap, the original bimap is returned.-}
+adjust :: (Ord a, Ord b) => (b -> b) -> a -> Bimap a b -> Bimap a b
+adjust f = adjustWithKey (const f)
+
+{-| /O(log n)/.
+Update a value at a specific right key with the result of the provided function.
+
+When the right key is not a member of the bimap, the original bimap is returned.-}
+adjustR :: (Ord a, Ord b) => (a -> a) -> b -> Bimap a b -> Bimap a b
+adjustR f b = reverseBimap . adjust f b . reverseBimap
+  where reverseBimap (MkBimap left right) = MkBimap right left
+
+{-| /O(log n)/.
+Adjust a value at a specific left key.
+
+When the left key is not a member of the bimap, the original bimap is returned.-}
+adjustWithKey :: (Ord a, Ord b) => (a -> b -> b) -> a -> Bimap a b -> Bimap a b
+adjustWithKey f = updateWithKey (\a -> Just . f a)
+
+{-| /O(log n)/.
+Adjust a value at a specific right key.
+
+When the right key is not a member of the bimap, the original bimap is returned.-}
+adjustWithKeyR :: (Ord a, Ord b) => (b -> a -> a) -> b -> Bimap a b -> Bimap a b
+adjustWithKeyR f b = reverseBimap . adjustWithKey f b . reverseBimap
+  where reverseBimap (MkBimap left right) = MkBimap right left
+
+{-| /O(log n)/.
+The expression (@'update' f a bimap@) updates the right value @b@ at @a@ (if it is in the bimap).
+
+If (@f b@) is 'Nothing', the element is deleted.
+
+If it is (@'Just' y@), the left key @a@ is bound to the new value @y@.-}
+update :: (Ord a, Ord b) => (b -> Maybe b) -> a -> Bimap a b -> Bimap a b
+update f = updateWithKey (const f)
+
+{-| /O(log n)/.
+The expression (@'updateR' f b bimap@) updates the left value @a@ at @b@ (if it is in the bimap).
+
+If (@f a@) is 'Nothing', the element is deleted.
+
+If it is (@'Just' x@), the right key @b@ is bound to the new value @x@.-}
+updateR :: (Ord a, Ord b) => (a -> Maybe a) -> b -> Bimap a b -> Bimap a b
+updateR f b = reverseBimap . update f b . reverseBimap
+  where reverseBimap (MkBimap left right) = MkBimap right left
+
+{-| /O(log n)/.
+The expression (@'updateWithKey' f a bimap@) updates the right value @b@ at @a@ (if it is in the bimap).
+
+If (@f a b@) is 'Nothing', the element is deleted.
+
+If it is (@'Just' y@), the left key @a@ is bound to the new value @y@.-}
+updateWithKey :: (Ord a, Ord b) => (a -> b -> Maybe b) -> a -> Bimap a b -> Bimap a b
+updateWithKey f a (MkBimap left right) = MkBimap left' right' where
+  oldB = M.lookup a left
+  newB = f a =<< oldB
+  oldA = newB >>= (`M.lookup` right) >>= \x -> if x == a then Nothing else Just x
+  left' = maybe id M.delete oldA $ M.updateWithKey f a left
+  right' = maybe id (`M.insert` a) newB $ maybe id M.delete oldB right
+
+{-| /O(log n)/.
+The expression (@'updateWithKeyR' f b bimap@) updates the left value @a@ at @b@ (if it is in the bimap).
+
+If (@f b a@) is 'Nothing', the element is deleted.
+
+If it is (@'Just' x@), the right key @b@ is bound to the new value @x@.-}
+updateWithKeyR :: (Ord a, Ord b) => (b -> a -> Maybe a) -> b -> Bimap a b -> Bimap a b
+updateWithKeyR f b = reverseBimap . updateWithKey f b . reverseBimap
+  where reverseBimap (MkBimap left right) = MkBimap right left
+
 
 {-| /O(log n)/.
 Lookup a left key in the bimap, returning the associated right key.
