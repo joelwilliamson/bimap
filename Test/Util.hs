@@ -30,14 +30,19 @@ propertyNames =
     firstToken = fst . head . lex
     isProperty = isPrefixOf "prop_"
 
-{- Inspired by & borrowed from: -}
--- http://blog.codersbase.com/2006/09/01/simple-unit-testing-in-haskell/
-mkCheck name =
-    [| printf "%-25s : " name >> quickCheck $(varE (mkName name)) |]
+resultIsSuccess Success {} = True
+resultIsSuccess _ = False
 
-mkChecks []        = undefined -- if we don't have any tests, then the test suite is undefined right?
-mkChecks [name]    = mkCheck name
-mkChecks (name:ns) = [| $(mkCheck name) >> $(mkChecks ns) |]
+mkCheck' name = [| printf "%-25s : " name
+                   >> quickCheckResult $(varE (mkName name))
+                   >>= return . resultIsSuccess |]
+mkChecks' [] = undefined
+mkChecks' [name] = mkCheck' name
+mkChecks' (name:ns) = [| do
+                          this <- $(mkCheck' name)
+                          rest <- $(mkChecks' ns)
+                          return $ this && rest |]
+
 
 {-
 Extract the names of QuickCheck tests from a file, and splice in
@@ -45,4 +50,4 @@ a sequence of calls to them. The module doing the splicing must
 also import the file being processed.
 -}
 extractTests :: FilePath -> Q Exp
-extractTests = (mkChecks =<<) . runIO . fileProperties
+extractTests = (mkChecks' =<<) . runIO . fileProperties

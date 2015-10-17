@@ -13,22 +13,26 @@ copyright:           Stuart Cook and contributors 2008, Joel Williamson 2015
 author:              Stuart Cook and contributors 2008, Joel Williamson 2015
 maintainer:          Joel Williamson <joel@joelwilliamson.ca>
 homepage:            https://github.com/joelwilliamson/bimap
--- This build-type is a lie, but we're only using hooks to specify
--- a test command, so there shouldn't be any problems.
 build-type:          Simple
 tested-with:         GHC ==7.8.4
 extra-source-files:
     HISTORY
     tests.sh
-    Test/Tests.hs
-    Test/Util.hs
-    Test/RunTests.hs
 
 Library
   build-depends:       base >= 4 && <5, containers, exceptions
   ghc-options:         -Wall
   exposed-modules:
       Data.Bimap
+
+test-suite tests
+    type:            exitcode-stdio-1.0
+    main-is:         Test/RunTests.hs
+    build-depends:   base >= 4 && < 5,
+                     containers,
+                     exceptions,
+                     QuickCheck >= 2 && < 3
+                     template-haskell >= 2 && < 3
 
 source-repository head
     type:         git
