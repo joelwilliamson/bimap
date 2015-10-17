@@ -38,6 +38,8 @@ module Data.Bimap (
     tryInsert,
     adjust,
     adjustR,
+    adjustWithKey,
+    adjustWithKeyR,
     delete,
     deleteR,
     -- * Min\/Max
@@ -228,12 +230,7 @@ Update a value at a specific left key with the result of the provided function.
 
 When the left key is not a member of the bimap, the original bimap is returned.-}
 adjust :: (Ord a, Ord b) => (b -> b) -> a -> Bimap a b -> Bimap a b
-adjust f a (MkBimap left right) = MkBimap left' right' where
-  oldB = M.lookup a left
-  newB = f <$> oldB
-  oldA = flip M.lookup right =<< newB
-  left' = maybe id M.delete oldA $ M.adjust f a left
-  right' = maybe id (`M.insert` a) newB $ maybe id M.delete oldB right
+adjust f = adjustWithKey (const f)
 
 {-| /O(log n)/.
 Update a value at a specific right key with the result of the provided function.
@@ -241,6 +238,26 @@ Update a value at a specific right key with the result of the provided function.
 When the right key is not a member of the bimap, the original bimap is returned.-}
 adjustR :: (Ord a, Ord b) => (a -> a) -> b -> Bimap a b -> Bimap a b
 adjustR f b = reverseBimap . adjust f b . reverseBimap
+  where reverseBimap (MkBimap left right) = MkBimap right left
+
+{-| /O(log n)/.
+Adjust a value at a specific left key.
+
+When the left key is not a member of the bimap, the original bimap is returned.-}
+adjustWithKey :: (Ord a, Ord b) => (a -> b -> b) -> a -> Bimap a b -> Bimap a b
+adjustWithKey f a (MkBimap left right) = MkBimap left' right' where
+  oldB = M.lookup a left
+  newB = f a <$> oldB
+  oldA = flip M.lookup right =<< newB
+  left' = maybe id M.delete oldA $ M.adjust (f a) a left
+  right' = maybe id (`M.insert` a) newB $ maybe id M.delete oldB right
+
+{-| /O(log n)/.
+Adjust a value at a specific right key.
+
+When the right key is not a member of the bimap, the original bimap is returned.-}
+adjustWithKeyR :: (Ord a, Ord b) => (b -> a -> a) -> b -> Bimap a b -> Bimap a b
+adjustWithKeyR f b = reverseBimap . adjustWithKey f b . reverseBimap
   where reverseBimap (MkBimap left right) = MkBimap right left
 
 {-| /O(log n)/.
