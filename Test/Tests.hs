@@ -1,6 +1,6 @@
 module Test.Tests where
 
-import Data.List (sort)
+import Data.List (nub, sort)
 import qualified Data.Set as S
 import Prelude hiding (null, lookup, filter,map)
 import qualified Prelude as P
@@ -83,8 +83,9 @@ prop_fromAscPairList_reconstitute xs = and
 -- fromAscPairList will never produce an invalid bimap
 prop_fromAscPairList_check xs = valid bi
     where
+    xs' = zip (nub $ sort $ P.map fst xs) (nub $ sort $ P.map snd xs)
     bi :: Bimap Int Integer
-    bi = fromAscPairList xs
+    bi = fromAscPairList xs'
 
 -- if a pair is a member of the bimap, then both elements are present
 -- and associated with each other
