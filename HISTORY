@@ -1,3 +1,11 @@
+Version 0.3.1 (17 October 2015)
+
+  * Added update and adjust functions (thanks to koral)
+
+Version 0.3.0 (12 Mar 2015)
+
+  * Added map functions
+
 Version 0.2.4 (25 Aug 2008)
 
   * added filter and partition
