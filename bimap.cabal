@@ -1,4 +1,4 @@
-cabal-version:       >= 1.6
+cabal-version:       >= 1.8
 name:                bimap
 version:             0.3.1
 synopsis:            Bidirectional mapping between two key types
@@ -14,13 +14,13 @@ author:              Stuart Cook and contributors 2008, Joel Williamson 2015
 maintainer:          Joel Williamson <joel@joelwilliamson.ca>
 homepage:            https://github.com/joelwilliamson/bimap
 build-type:          Simple
-tested-with:         GHC ==7.8.4
+tested-with:         GHC ==7.10.2
 extra-source-files:
     HISTORY
-    tests.sh
 
 Library
   build-depends:       base >= 4 && <5, containers, exceptions
+  extensions:          DeriveDataTypeable
   ghc-options:         -Wall
   exposed-modules:
       Data.Bimap
@@ -31,8 +31,9 @@ test-suite tests
     build-depends:   base >= 4 && < 5,
                      containers,
                      exceptions,
-                     QuickCheck >= 2 && < 3
+                     QuickCheck >= 2 && < 3,
                      template-haskell >= 2 && < 3
+  extensions:        DeriveDataTypeable
 
 source-repository head
     type:         git
