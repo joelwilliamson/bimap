@@ -1,6 +1,6 @@
 cabal-version:       >= 1.8
 name:                bimap
-version:             0.3.1
+version:             0.3.2
 synopsis:            Bidirectional mapping between two key types
 description:
   A data structure representing a bidirectional mapping between two
@@ -14,7 +14,7 @@ author:              Stuart Cook and contributors 2008, Joel Williamson 2015
 maintainer:          Joel Williamson <joel@joelwilliamson.ca>
 homepage:            https://github.com/joelwilliamson/bimap
 build-type:          Simple
-tested-with:         GHC ==7.10.2
+tested-with:         GHC <= 7.10.2 && >=7.0
 extra-source-files:
     HISTORY
 
