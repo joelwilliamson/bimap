@@ -28,6 +28,8 @@ Library
 test-suite tests
     type:            exitcode-stdio-1.0
     main-is:         Test/RunTests.hs
+    other-modules:   Test.Tests
+                     Test.Util
     build-depends:   base >= 4 && < 5,
                      containers,
                      exceptions,
