@@ -14,7 +14,7 @@ author:              Stuart Cook and contributors 2008, Joel Williamson 2015
 maintainer:          Joel Williamson <joel@joelwilliamson.ca>
 homepage:            https://github.com/joelwilliamson/bimap
 build-type:          Simple
-tested-with:         GHC <= 7.10.2 && >=7.0
+tested-with:         GHC <= 7.10.2 && >= 7.0
 extra-source-files:
     HISTORY
 
