@@ -89,6 +89,7 @@ module Data.Bimap (
 
 import           Control.Monad.Catch
 
+import           Data.Function       (on)
 import           Data.List           (foldl', sort)
 import qualified Data.Map            as M
 import           Data.Maybe          (fromMaybe)
@@ -111,7 +112,10 @@ instance (Show a, Show b) => Show (Bimap a b) where
     show x = "fromList " ++ (show . toList $ x)
 
 instance (Eq a, Eq b) => Eq (Bimap a b) where
-    (==) bx by = toAscList bx == toAscList by
+    (==) = (==) `on` toAscList
+
+instance (Ord a, Ord b) => Ord (Bimap a b) where
+    compare = compare `on` toAscList
 
 {-|
 A 'Bimap' action failed.
