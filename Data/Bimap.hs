@@ -1,3 +1,8 @@
+{-# LANGUAGE CPP #-}
+#if __GLASGOW_HASKELL__ >= 708
+{-# LANGUAGE TypeFamilies #-}
+#endif
+
 {-|
 An implementation of bidirectional maps between values of two
 key types. A 'Bimap' is essentially a bijection between subsets of
@@ -95,6 +100,10 @@ import qualified Data.Map            as M
 import           Data.Maybe          (fromMaybe)
 import           Data.Typeable
 
+#if __GLASGOW_HASKELL__ >= 708
+import qualified GHC.Exts            as GHCExts
+#endif
+
 import           Prelude             hiding (filter, lookup, null, pred)
 import qualified Prelude             as P
 
@@ -116,6 +125,13 @@ instance (Eq a, Eq b) => Eq (Bimap a b) where
 
 instance (Ord a, Ord b) => Ord (Bimap a b) where
     compare = compare `on` toAscList
+
+#if __GLASGOW_HASKELL__ >= 708
+instance (Ord a, Ord b) => GHCExts.IsList (Bimap a b) where
+    type Item (Bimap a b) = (a, b)
+    fromList = fromList
+    toList = toList
+#endif
 
 {-|
 A 'Bimap' action failed.
@@ -604,7 +620,7 @@ Calls @'error'@ if the bimap is empty.
 /Version: 0.2.2/-}
 deleteMax :: (Ord b) => Bimap a b -> Bimap a b
 deleteMax = snd . deleteFindMax
- 
+
 {-| /O(log n)/.
 Delete the element with maximal right key.
 Calls @'error'@ if the bimap is empty.
@@ -620,7 +636,7 @@ findMax :: Bimap a b -> (a, b)
 findMax = M.findMax . toMap
 
 {-| /O(log n)/.
-Find the element with maximal right key. The 
+Find the element with maximal right key. The
 right-hand key is the first entry in the pair.
 Calls @'error'@ if the bimap is empty.
 /Version: 0.2.2/-}
@@ -650,7 +666,7 @@ Calls @'error'@ if the bimap is empty.
 /Version: 0.2.2/-}
 deleteMin :: (Ord b) => Bimap a b -> Bimap a b
 deleteMin = snd . deleteFindMin
- 
+
 {-| /O(log n)/.
 Delete the element with minimal right key.
 Calls @'error'@ if the bimap is empty.
@@ -666,7 +682,7 @@ findMin :: Bimap a b -> (a, b)
 findMin = M.findMin . toMap
 
 {-| /O(log n)/.
-Find the element with minimal right key. The 
+Find the element with minimal right key. The
 right-hand key is the first entry in the pair.
 Calls @'error'@ if the bimap is empty.
 /Version: 0.2.2/-}
