@@ -44,6 +44,9 @@ prop_size_empty = size empty == 0
 -- empty bimap is null
 prop_null_empty = null empty
 
+-- empty bimap has non-zero size
+prop_false = size empty == 2
+
 -- when converting from a list and back, each pair in the latter
 -- list was originally in the former list
 -- (heh, this is probably made redundant by polymorphism)
