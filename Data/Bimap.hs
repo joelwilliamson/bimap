@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE DeriveGeneric #-}
 #if __GLASGOW_HASKELL__ >= 708
 {-# LANGUAGE TypeFamilies #-}
 #endif
@@ -92,6 +93,7 @@ module Data.Bimap (
     twisted,
 ) where
 
+import           Control.DeepSeq     (NFData)
 import           Control.Monad.Catch
 
 import           Data.Function       (on)
@@ -103,6 +105,7 @@ import           Data.Typeable
 #if __GLASGOW_HASKELL__ >= 708
 import qualified GHC.Exts            as GHCExts
 #endif
+import           GHC.Generics        (Generic)
 
 import           Prelude             hiding (filter, lookup, null, pred)
 import qualified Prelude             as P
@@ -115,7 +118,7 @@ infixr 9 .:
 {-|
 A bidirectional map between values of types @a@ and @b@.
 -}
-data Bimap a b = MkBimap !(M.Map a b) !(M.Map b a)
+data Bimap a b = MkBimap !(M.Map a b) !(M.Map b a) deriving (Generic)
 
 instance (Show a, Show b) => Show (Bimap a b) where
     show x = "fromList " ++ (show . toList $ x)
@@ -125,6 +128,8 @@ instance (Eq a, Eq b) => Eq (Bimap a b) where
 
 instance (Ord a, Ord b) => Ord (Bimap a b) where
     compare = compare `on` toAscList
+
+instance (NFData a, NFData b) => NFData (Bimap a b)
 
 #if __GLASGOW_HASKELL__ >= 708
 instance (Ord a, Ord b) => GHCExts.IsList (Bimap a b) where
@@ -688,4 +693,3 @@ Calls @'error'@ if the bimap is empty.
 /Version: 0.2.2/-}
 findMinR :: Bimap a b -> (b, a)
 findMinR = M.findMin . toMapR
-
