@@ -1,6 +1,6 @@
 cabal-version:       >= 1.8
 name:                bimap
-version:             0.3.3
+version:             0.4.0
 synopsis:            Bidirectional mapping between two key types
 description:
   A data structure representing a bidirectional mapping between two
