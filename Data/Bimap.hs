@@ -36,6 +36,8 @@ module Data.Bimap (
     lookupR,
     (!),
     (!>),
+    (!?),
+    (!?>),
     -- * Construction
     empty,
     singleton,
@@ -346,6 +348,9 @@ Lookup a left key in the bimap, returning the associated right key.
 This function will @return@ the result in the monad, or @fail@ if
 the value isn't in the bimap.
 
+Note that the signature differs slightly from Data.Map's @lookup@. This one is more general -
+it functions the same way as the "original" if @m@ is cast (or inferred) to Maybe.
+
 /Version: 0.2/-}
 lookup :: (Ord a, Ord b, MonadThrow m)
        => a -> Bimap a b -> m b
@@ -357,6 +362,8 @@ lookup x (MkBimap left _) =
 {-| /O(log n)/.
 A version of 'lookup' that is specialized to the right key,
 and returns the corresponding left key.
+
+
 /Version: 0.2/-}
 lookupR :: (Ord a, Ord b, MonadThrow m)
         => b -> Bimap a b -> m a
@@ -378,6 +385,16 @@ and returns the corresponding left key.
 /Version: 0.2/-}
 (!>) :: (Ord a, Ord b) => Bimap a b -> b -> a
 (!>) bi y = fromMaybe (error "Data.Bimap.(!>): Right key not found") $ lookupR y bi
+
+{-| /O(log n)/.
+See 'lookup'. -}
+(!?) :: (Ord a, Ord b, MonadThrow m) => Bimap a b -> a -> m b
+(!?) = flip lookup
+
+{-| /O(log n)/.
+See 'lookupR'. -}
+(!?>) :: (Ord a, Ord b, MonadThrow m) => Bimap a b -> b -> m a
+(!?>) = flip lookupR
 
 {-| /O(n*log n)/.
 Build a map from a list of pairs. If there are any overlapping
