@@ -388,13 +388,13 @@ and returns the corresponding left key.
 
 {-| /O(log n)/.
 See 'lookup'. -}
-(!?) :: (Ord a, Ord b, MonadThrow m) => a -> Bimap a b -> m b
-(!?) = lookup
+(!?) :: (Ord a, Ord b, MonadThrow m) => Bimap a b -> a -> m b
+(!?) = flip lookup
 
 {-| /O(log n)/.
 See 'lookupR'. -}
-(!?>) :: (Ord a, Ord b, MonadThrow m) => b -> Bimap a b -> m a
-(!?>) = lookupR
+(!?>) :: (Ord a, Ord b, MonadThrow m) => Bimap a b -> b -> m a
+(!?>) = flip lookupR
 
 {-| /O(n*log n)/.
 Build a map from a list of pairs. If there are any overlapping
