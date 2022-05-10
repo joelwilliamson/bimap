@@ -381,9 +381,13 @@ and returns the corresponding left key.
 (!>) :: (Ord a, Ord b) => Bimap a b -> b -> a
 (!>) bi y = fromMaybe (error "Data.Bimap.(!>): Right key not found") $ lookupR y bi
 
+{-| /O(log n)/.
+See 'lookup'. -}
 (!?) :: (Ord a, Ord b, MonadThrow m) => a -> Bimap a b -> m b
 (!?) = lookup
 
+{-| /O(log n)/.
+See 'lookupR'. -}
 (!?>) :: (Ord a, Ord b, MonadThrow m) => b -> Bimap a b -> m a
 (!?>) = lookupR
 
