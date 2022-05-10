@@ -36,6 +36,8 @@ module Data.Bimap (
     lookupR,
     (!),
     (!>),
+    (!?),
+    (!?>),
     -- * Construction
     empty,
     singleton,
@@ -378,6 +380,12 @@ and returns the corresponding left key.
 /Version: 0.2/-}
 (!>) :: (Ord a, Ord b) => Bimap a b -> b -> a
 (!>) bi y = fromMaybe (error "Data.Bimap.(!>): Right key not found") $ lookupR y bi
+
+(!?) :: (Ord a, Ord b, MonadThrow m) => a -> Bimap a b -> m b
+(!?) = lookup
+
+(!?>) :: (Ord a, Ord b, MonadThrow m) => b -> Bimap a b -> m a
+(!?>) = lookupR
 
 {-| /O(n*log n)/.
 Build a map from a list of pairs. If there are any overlapping
