@@ -105,7 +105,7 @@ import           Data.Maybe          (fromMaybe)
 import           Data.Typeable
 
 #if __GLASGOW_HASKELL__ >= 708
-import qualified GHC.Exts            as GHCExts
+import qualified Data.BimapExt       as GHCExts
 #endif
 import           GHC.Generics        (Generic)
 
